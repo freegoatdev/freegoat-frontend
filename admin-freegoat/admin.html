@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FREEGOAT - Painel Administrativo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      background-color: #f9f9f9;
+    }
+    #logo {
+      width: 100px;
+      margin-bottom: 20px;
+    }
+    #connectButton {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #000;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    #connectButton:hover {
+      background-color: #333;
+    }
+    #status {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    #adminPanel {
+      display: none;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <img id="logo" src="logo/freegoat-logo.png" alt="FREEGOAT Logo">
+  <h1>FREEGOAT - Painel Administrativo</h1>
+  <button id="connectButton">Login com Phantom</button>
+  <div id="status"></div>
+  <div id="adminPanel">
+    <h2>Bem-vindo, administrador!</h2>
+    <p>Aqui estará o conteúdo do painel admin da plataforma.</p>
+  </div>
+  <script>
+    const connectButton = document.getElementById('connectButton');
+    const statusDiv = document.getElementById('status');
+    const adminPanel = document.getElementById('adminPanel');
+
+    async function connectWallet() {
+      try {
+        const resp = await window.solana.connect();
+        const walletAddress = resp.publicKey.toString();
+
+        // Assinatura de verificação
+        const encodedMessage = new TextEncoder().encode("Autenticar painel FREEGOAT");
+        const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
+
+        statusDiv.innerText = "Carteira conectada: " + walletAddress;
+        connectButton.style.display = "none";
+        adminPanel.style.display = "block";
+      } catch (err) {
+        console.error(err);
+        statusDiv.innerText = "Erro ao conectar a carteira.";
+      }
+    }
+
+    connectButton.addEventListener('click', connectWallet);
+
+    // Detecta carteira Phantom
+    window.addEventListener('load', () => {
+      if (!window.solana || !window.solana.isPhantom) {
+        statusDiv.innerHTML = '<p style="color:red;">Carteira Phantom não encontrada. Instale a extensão para continuar.</p>';
+        connectButton.disabled = true;
+      }
+    });
+  </script>
+</body>
+</html>
