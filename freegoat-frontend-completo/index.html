@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>FREEGOAT | Plataforma Web3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.74.2/lib/index.iife.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f3f4f0;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #ffffff;
+      padding: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    header img {
+      max-height: 80px;
+    }
+    main {
+      padding: 20px;
+    }
+    button {
+      padding: 12px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+    img.nft {
+      margin-top: 30px;
+      max-width: 200px;
+      border-radius: 12px;
+      border: 2px solid #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo/freegoat-logo.png" alt="FREEGOAT Logo">
+  </header>
+  <main>
+    <h1>Bem-vindo à FREEGOAT</h1>
+    <button onclick="conectarCarteira()">Conectar Carteira Phantom</button>
+    <div id="status"></div>
+    <img id="nftImage" class="nft" style="display:none">
+  </main>
+  <script>
+    let publicKey = null;
+
+    async function conectarCarteira() {
+      const provider = window.solana;
+      if (!provider || !provider.isPhantom) {
+        document.getElementById('status').innerText = 'Carteira Phantom não encontrada.';
+        return;
+      }
+
+      try {
+        const resp = await provider.connect();
+        publicKey = resp.publicKey.toString();
+
+        // Assina mensagem
+        const message = new TextEncoder().encode("Login FREEGOAT");
+        const { signature } = await provider.signMessage(message, "utf8");
+
+        const res = await fetch("https://freegoat-backend.onrender.com/auth/login", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ wallet: publicKey, signature: Array.from(signature) })
+        });
+
+        const data = await res.json();
+        if (data.login) {
+          document.getElementById('status').innerText = `Conectado: ${publicKey}\nAdmin: ${data.isAdmin}`;
+          mostrarNFT(data.nft || 1);
+        } else {
+          document.getElementById('status').innerText = 'Login falhou.';
+        }
+      } catch (err) {
+        document.getElementById('status').innerText = 'Erro ao conectar ou assinar.';
+      }
+    }
+
+    function mostrarNFT(campo) {
+      const imagens = {
+        1: 'nfts/learner-goat.png',
+        2: 'nfts/fellow-goat.png',
+        3: 'nfts/master-goat.png',
+        4: 'nfts/wize-goat.png',
+        5: 'nfts/free-goat.png',
+      };
+      const img = document.getElementById('nftImage');
+      img.src = imagens[campo] || imagens[1];
+      img.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
