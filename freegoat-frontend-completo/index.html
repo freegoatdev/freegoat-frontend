@@ -1,110 +1,49 @@
+
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>FREEGOAT | Plataforma Web3</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.74.2/lib/index.iife.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FREEGOAT</title>
   <style>
     body {
-      font-family: sans-serif;
-      background-color: #f3f4f0;
-      margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
       text-align: center;
+      padding: 40px;
     }
-    header {
-      background-color: #ffffff;
-      padding: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    header img {
-      max-height: 80px;
-    }
-    main {
-      padding: 20px;
+    img.logo {
+      max-width: 200px;
+      margin-bottom: 30px;
     }
     button {
-      padding: 12px 20px;
-      background-color: #4CAF50;
+      padding: 12px 24px;
+      font-size: 18px;
+      cursor: pointer;
+      background-color: #8847ff;
       color: white;
       border: none;
       border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 20px;
     }
-    #status {
-      margin-top: 20px;
-      font-weight: bold;
-      color: #333;
+    .nft-preview {
+      margin-top: 40px;
     }
-    img.nft {
-      margin-top: 30px;
-      max-width: 200px;
-      border-radius: 12px;
-      border: 2px solid #4CAF50;
+    .nft-preview img {
+      max-width: 250px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.1);
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo/freegoat-logo.png" alt="FREEGOAT Logo">
-  </header>
-  <main>
-    <h1>Bem-vindo à FREEGOAT</h1>
-    <button onclick="conectarCarteira()">Conectar Carteira Phantom</button>
-    <div id="status"></div>
-    <img id="nftImage" class="nft" style="display:none">
-  </main>
-  <script>
-    let publicKey = null;
-
-    async function conectarCarteira() {
-      const provider = window.solana;
-      if (!provider || !provider.isPhantom) {
-        document.getElementById('status').innerText = 'Carteira Phantom não encontrada.';
-        return;
-      }
-
-      try {
-        const resp = await provider.connect();
-        publicKey = resp.publicKey.toString();
-
-        // Assina mensagem
-        const message = new TextEncoder().encode("Login FREEGOAT");
-        const { signature } = await provider.signMessage(message, "utf8");
-
-        const res = await fetch("https://freegoat-backend.onrender.com/auth/login", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ wallet: publicKey, signature: Array.from(signature) })
-        });
-
-        const data = await res.json();
-        if (data.login) {
-          document.getElementById('status').innerText = `Conectado: ${publicKey}\nAdmin: ${data.isAdmin}`;
-          mostrarNFT(data.nft || 1);
-        } else {
-          document.getElementById('status').innerText = 'Login falhou.';
-        }
-      } catch (err) {
-        document.getElementById('status').innerText = 'Erro ao conectar ou assinar.';
-      }
-    }
-
-    function mostrarNFT(campo) {
-      const imagens = {
-        1: 'nfts/learner-goat.png',
-        2: 'nfts/fellow-goat.png',
-        3: 'nfts/master-goat.png',
-        4: 'nfts/wize-goat.png',
-        5: 'nfts/free-goat.png',
-      };
-      const img = document.getElementById('nftImage');
-      img.src = imagens[campo] || imagens[1];
-      img.style.display = 'block';
-    }
-  </script>
+  <img src="freegoat-frontend-completo/logo/freegoat-logo.png" class="logo" alt="FREEGOAT Logo"/>
+  <h1>Bem-vindo ao FREEGOAT</h1>
+  <p>Conecte sua carteira Phantom para começar</p>
+  <button onclick="alert('Função de login será ativada em breve')">Conectar com Phantom</button>
+  <div class="nft-preview">
+    <h2>Seu NFT atual:</h2>
+    <img src="freegoat-frontend-completo/nfts/learner-goat.png" alt="NFT Learner Goat">
+  </div>
 </body>
 </html>
